@@ -1,12 +1,14 @@
 // Complete the sockMerchant function below.
 function sockMerchant(n, ar) {
-    // debugger;
+    // Create a pair count to be returned
     let pairCount = 0;
+
+    // sort the array ascending
     ar = ar.sort();
-    console.log(ar)
+
+    // Iterate through array. If there is a pair, increment pairCount by 1 otherwise go to next element
     for (let i = 0; i < n; i++){
         if (ar[i] == ar[i+1]){
-            console.log(ar[i] + " is equal to " + ar[i+1])
             pairCount++;
             i++;
         }
@@ -15,7 +17,6 @@ function sockMerchant(n, ar) {
 
 
     // Return the total number of matching pairs of socks
-    console.log(pairCount)
     return pairCount;
 }
 
