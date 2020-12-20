@@ -6,7 +6,7 @@ function highestAverage(scores){
     let studentScore;
     let existingGrade;
     let max = 0;
-    
+
     for (let i = 0; i < len; i++){
         studentName = scores[i][0];
         
@@ -21,12 +21,18 @@ function highestAverage(scores){
         }
     }
 
-    Object.keys(gradeBook).forEach(function (grade) {
-        if (gradeBook[grade] > max){
-            max = gradeBook[grade];
+    for (let name in gradeBook){
+        if (gradeBook[name] > max){
+            max = gradeBook[name];
         }
-    });
+    }
 
+    // Object.keys(gradeBook).forEach(function (grade) {
+    //     if (gradeBook[grade] > max){
+    //         max = gradeBook[grade];
+    //     }
+    // });
+    
     return max;
     
 }
