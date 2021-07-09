@@ -6,8 +6,7 @@
  var addStrings = function(num1, num2) {
     let convertedNum1 = parseInt(num1);
     let convertedNum2 = parseInt(num2);
-    var sumAgain = +num1 + +num2;
-    console.log(sumAgain);
+
     let sum = convertedNum1 + convertedNum2;
     console.log(sum.toString());
     return sum.toString();
