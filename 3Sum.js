@@ -4,7 +4,7 @@
 //     if (nums.length === 0){
 //         return [];
 //     }
-    
+
 //     if (nums.length === 1){
 //         return [];
 //     }
@@ -20,8 +20,8 @@
 //           }
 //         }
 //         return -1;
-//     } 
-      
+//     }
+
 //     for (let i = 0; i < nums.length; i++){
 //         for (let j = i + 1; j < nums.length; j++){
 //             for (let k = j + 1; k < nums.length; k++){
@@ -30,59 +30,48 @@
 //                 if (sum == 0 && (searchForArray(finalArray,prePush) == -1)){
 //                     finalArray.push(prePush);
 //                 }
-             
+
 //             }
-               
+
 //         }
 //     }
 
 //     return finalArray;
-    
+
 // };
-var threeSum = function(nums) {
-    
-    let finalArray = [];
-    // Edge cases
-    if (nums.length === 0){
-        return [];
-    }
-    
-    if (nums.length === 1){
-        return [];
-    }
+var threeSum = function (nums) {
+  // two pointer method
+  let result = [];
 
-    nums.sort((a,b) => {a - b});
+  nums.sort((a, b) => a - b);
 
-    let left = 0; // start calculating
-    let right = nums.length - 1; // start at the end
+  let left = 0;
+  let right = nums.length - 1;
+  let seen = {};
+  for (let i = 0; i < nums.length; i++) {
+    // no duplicates
+    if (i > 0 && nums[i] === nums[i - 1]) continue;
 
-    for (let i = 0; i < nums.length; i++){
-        // i is our current index we start from
-        if (i > 0 && nums[i] === nums[i - 1]) continue;
+    left = i + 1;
+    right = nums.length - 1;
+    let sum = 0;
+    while (left < right) {
+      sum = nums[i] + nums[left] + nums[right];
+
+      if (sum === 0 && !seen[left] && !seen[right]) {
+        result.push([nums[i], nums[left], nums[right]]);
+        left++;
+        right--;
+        seen[left] = true;
+        seen[right] = true;
         
-        left = i + 1;
-        right = nums.length - 1;
-        let sum = 0;
-
-        while (left < right){
-            sum = nums[i] + nums[left] + nums[right];
-            if (sum === 0) {
-                finalArray.push([nums[i], nums[left], nums[right]]);
-                left++;
-                right--;
-                
-                // remove duplicates
-                while(left < right && nums[left] === nums[left - 1]) left++;
-                while(left < right && nums[right] === nums[right + 1]) right--;
-
-            } else if (sum > 0){
-                right--;
-            } else {
-                left++;
-            }
-        }
-        return finalArray;
+      } else if (sum > 0) {
+        right--;
+      } else {
+        left++;
+      }
     }
-
+  }
+  return result;
 };
-console.log(threeSum([-1,0,1,2,-1,-4]));
+console.log(threeSum([-1, 0, 1, 2, -1, -4]));
