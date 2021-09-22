@@ -2,11 +2,7 @@ const isAnagram = (word1, word2) => {
     let word1Map = placeInMap(word1);
     let word2Map = placeInMap(word2);
 
-    return objectEquals2(word1Map, word2Map)
-    
-
-    
-
+    return objectEquality(word1Map, word2Map)
 
 }
 
@@ -63,6 +59,24 @@ function objectEquals2(obj1, obj2) {
             if (obj1[i] != obj2[i]) return false;
         }
     }
+    return true;
+}
+
+const objectEquality = (obj1, obj2) => {
+    for (const i in obj1){
+        if(obj1.hasOwnProperty(i)){
+            if(!obj2.hasOwnProperty(i)) return false;
+            if(obj1[i] != obj2[i]) return false;
+        }
+    }
+
+    for (const i in obj2){
+        if(obj2.hasOwnProperty(i)){
+            if(!obj1.hasOwnProperty(i)) return false;
+            if(obj2[i] != obj1[i]) return false;
+        }
+    }
+
     return true;
 }
 
