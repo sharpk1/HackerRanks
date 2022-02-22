@@ -1,0 +1,49 @@
+var isValid = function(s) {
+    
+    // edge cases
+    if (s === "()"){
+        return true;
+    }
+    if (s === "[]"){
+        return true;
+    }
+    if(s === "{}"){
+        return true;
+    }
+    
+    s = s.split('');
+    
+    let closeArray = [];
+    
+    // Mapping out constants
+    const openingBrackets = ["(", "[", "{"];
+    const bracketMap = {
+        "(":")",
+        "[":"]",
+        "{":"}",
+    }
+    
+    for (let i = 0; i < s.length; i++){
+        
+        // if we're starting a bracket, push the opposite character into closeArray at [0]
+        if (openingBrackets.includes(s[i])){
+            closeArray.unshift(bracketMap[s[i]]);
+                            
+        }else if (s[i] === closeArray[0]){
+        // if the brackets close just fine, remove it from the close array
+            closeArray.shift();
+        }else{
+        // any other scenario will be false
+            return false;
+        }
+    }
+    
+    // closeArray should be reconciled at 0 for a true, otherwise it's false
+    if (closeArray.length == 0){
+        return true;
+    }else{
+        return false;
+    }
+    
+    
+};
