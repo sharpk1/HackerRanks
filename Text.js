@@ -6,6 +6,12 @@ const textEditor = (input) => {
     let isSelect = false;
     let startIndex = -1;
     let endIndex = -1;
+    let pointer = 0;
+
+    for (let i = 0; i < input.length; i++){
+        input[i].unshift(`${i}`);
+    }
+    console.log(input);
 
     input.sort((a, b) => a[0] - b[0]);
 
@@ -28,8 +34,19 @@ const textEditor = (input) => {
 
                     }
                 } else {
-                    output.push(payload);
-                    actions.push(operation);
+                    let tempOutput = output.join('');
+                    if (pointer != 0){
+                        tempOutput = tempOutput.split('');
+                        console.log(tempOutput);
+                        tempOutput.splice(pointer, 0, payload);
+                        output = tempOutput;
+
+                        
+                    }else {
+                        output.push(payload);
+                        actions.push(operation);
+                    }
+                    
                 }
 
                 break;
@@ -94,6 +111,12 @@ const textEditor = (input) => {
 
                     }
                 }
+                break;
+            case "MOVE":
+                pointer = payload;
+                break;
+
+                
                 
         }
 
@@ -183,15 +206,22 @@ const testInput12 = [
     ["5", "UNDO"]
 ]
 
-console.log(textEditor(testInput) == "Hey there!");
-console.log(textEditor(testInput2) == "Hey y");
-console.log(textEditor(testInput3) == "Hey");
-console.log(textEditor(testInput4) == "");
-console.log(textEditor(testInput5) == "Hey there");
-console.log(textEditor(testInput6) == " there");
-console.log(textEditor(testInput7) == "Hey");
-console.log(textEditor(testInput8) == "Hlo");
-console.log(textEditor(testInput9) == "Hey there");
-console.log(textEditor(testInput10) == "H*el*lo");
-console.log(textEditor(testInput11) == "Hey there!");
-console.log(textEditor(testInput12) == "This is a ");
+const query1 = [
+    ["APPEND", "Hey you"],
+    ["MOVE", "3"],
+    ["APPEND", ","]
+]
+
+// console.log(textEditor(testInput) == "Hey there!");
+// console.log(textEditor(testInput2) == "Hey y");
+// console.log(textEditor(testInput3) == "Hey");
+// console.log(textEditor(testInput4) == "");
+// console.log(textEditor(testInput5) == "Hey there");
+// console.log(textEditor(testInput6) == " there");
+// console.log(textEditor(testInput7) == "Hey");
+// console.log(textEditor(testInput8) == "Hlo");
+// console.log(textEditor(testInput9) == "Hey there");
+// console.log(textEditor(testInput10) == "H*el*lo");
+// console.log(textEditor(testInput11) == "Hey there!");
+// console.log(textEditor(testInput12) == "This is a ");
+console.log(textEditor(query1) == "Hey, you");
