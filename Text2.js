@@ -8,8 +8,8 @@ const textEditor = (input) => {
         selection: false,
         selectionStart: -1,
         selectionEnd: -1,
+        cursorPosition: 0
     }
-    let cursorPosition = 0;
     let clipboard = [];
     let documents = []; // [documentName, cursor position, document data]
     let isSelect = false;
@@ -24,59 +24,67 @@ const textEditor = (input) => {
         const [operation, contentOrStartPosition, endingPosition] = inputLine;
 
         switch (operation) {
+            
             case "APPEND":
                 currentDocument.selection = isSelect;
                 if (isSelect){
-                    if (currentDocument.selectionEnd != -1){
-                        endPosition = currentDocument.selectionEnd;
-                    }
+                    // if (currentDocument.selectionEnd != -1){
+                    //     console.log(currentDocument.selectionEnd);
+                    //     endPosition = currentDocument.selectionEnd;
+                    // }
                     let tempOutput = currentDocument.output.join('');
                     tempOutput = tempOutput.split('');
-                    tempOutput.splice(cursorPosition, endPosition - cursorPosition, contentOrStartPosition);
-                    cursorPosition = parseInt(cursorPosition) + contentOrStartPosition.length;
+                    tempOutput.splice(currentDocument.cursorPosition, currentDocument.selectionEnd - currentDocument.cursorPosition, contentOrStartPosition);
+                    currentDocument.cursorPosition = parseInt(currentDocument.cursorPosition) + contentOrStartPosition.length;
                     currentDocument.output = tempOutput;
                     isSelect = false;
-                    currentDocument.selectionStart = cursorPosition;
-                    currentDocument.selectionEnd = endPosition;
-                    endPosition = -1;
-                }else if (cursorPosition !== currentDocument.output.join('').length - 1){
+                    currentDocument.selectionStart = currentDocument.cursorPosition;
+                    currentDocument.selectionEnd = -1;
+                    
+                    
+                }else if (currentDocument.cursorPosition !== currentDocument.output.join('').length - 1){
                     let tempOutput = currentDocument.output.join('');
                     tempOutput = tempOutput.split('');
-                    tempOutput.splice(cursorPosition, 0, contentOrStartPosition);
-                    cursorPosition = parseInt(cursorPosition) + contentOrStartPosition.length;
+                    tempOutput.splice(currentDocument.cursorPosition, 0, contentOrStartPosition);
+                    currentDocument.cursorPosition = parseInt(currentDocument.cursorPosition) + contentOrStartPosition.length;
                     currentDocument.output = tempOutput;
                 }else {
                     currentDocument.output.push(contentOrStartPosition);
-                    cursorPosition += contentOrStartPosition.length;
+                    currentDocument.cursorPosition += contentOrStartPosition.length;
                 }
                 break;
             case "MOVE":
-                cursorPosition = contentOrStartPosition;
+                currentDocument.cursorPosition = contentOrStartPosition;
                 endPosition = -1;
                 break;
             case "DELETE":
-                previousState.push(currentDocument.output)
+                
+                previousState.push(currentDocument);
                 currentDocument.selection = isSelect;
+                
                 if (isSelect){
                     let tempOutput = currentDocument.output.join('');
                     tempOutput = tempOutput.split('');
-                    tempOutput.splice(cursorPosition, endPosition - cursorPosition);
+                    tempOutput.splice(currentDocument.cursorPosition, currentDocument.selectionEnd - currentDocument.cursorPosition);
                     currentDocument.output = tempOutput;
                     isSelect = false;
-                    currentDocument.selectionStart = cursorPosition;
-                    currentDocument.selectionEnd = endPosition;
-                    endPosition = -1;
+                    currentDocument.selectionStart = currentDocument.cursorPosition;
+                    // currentDocument.selectionEnd = endPosition;
+                    currentDocument.selectionEnd = -1;
+                    
                 }else {
                     let tempOutput = currentDocument.output.join('');
                     tempOutput = tempOutput.split('');
-                    tempOutput.splice(cursorPosition, 1);
+                    tempOutput.splice(currentDocument.cursorPosition, 1);
                     currentDocument.output = tempOutput;
                 }
                 break;
             case "SELECT":
                 isSelect = true;
-                cursorPosition = contentOrStartPosition;
-                endPosition = endingPosition;
+                currentDocument.cursorPosition = contentOrStartPosition;
+                currentDocument.selectionEnd = endingPosition;
+                // cursorPosition = contentOrStartPosition;
+                // endPosition = endingPosition;
                 break;
             case "CUT":
                 // do what DELETE and COPY does
@@ -84,13 +92,16 @@ const textEditor = (input) => {
                 if (isSelect){
                     let tempOutput = currentDocument.output.join('');
                     tempOutput = tempOutput.split('');
-                    clipboard.push(tempOutput.slice(cursorPosition, endPosition).join(''));
-                    tempOutput.splice(cursorPosition, endPosition - cursorPosition);
+                    
+                    clipboard.push(tempOutput.slice(currentDocument.cursorPosition, currentDocument.selectionEnd).join(''));
+                    
+                    tempOutput.splice(currentDocument.cursorPosition, currentDocument.selectionEnd - currentDocument.cursorPosition);
                     currentDocument.output = tempOutput;
                     isSelect = false;
-                    currentDocument.selectionStart = cursorPosition;
-                    currentDocument.selectionEnd = endPosition;
-                    endPosition = -1;
+                    currentDocument.selectionStart = currentDocument.cursorPosition;
+                    currentDocument.selectionEnd = currentDocument.selectionEnd;
+                    currentDocument.selectionEnd = -1;
+                    currentDocument.cursorPosition--;
                 }
                 break;
             case "PASTE":
@@ -99,8 +110,8 @@ const textEditor = (input) => {
                 let tempOutput = currentDocument.output.join('');
 
                 tempOutput = tempOutput.split('');
-                tempOutput.splice(cursorPosition, 0, tempClipboard);
-                cursorPosition = parseInt(cursorPosition) + tempClipboard.length;
+                tempOutput.splice(currentDocument.cursorPosition, 0, tempClipboard);
+                currentDocument.cursorPosition = parseInt(currentDocument.cursorPosition) + tempClipboard.length;
                 currentDocument.output = tempOutput;
                 break;
             case "UNDO":
@@ -113,7 +124,7 @@ const textEditor = (input) => {
                 } else {
                     let temp = previousState.pop();
                     redoQueue.push(currentDocument.output);
-                    currentDocument.output = temp;
+                    currentDocument = temp;
                     isSelect = currentDocument.selection;                        
                 } 
                 break;
@@ -129,30 +140,27 @@ const textEditor = (input) => {
                 // Create object with document title, document data, and state
                 let found = documents.find(o => o.title === contentOrStartPosition);
                 if (found){
-                    console.log("");
+                    // console.log("");
                 } else {
-                    documents.push(currentDocument);
                     documents.push({
                         title: contentOrStartPosition,
                         output: [],
                         selection: false,
                         selectionStart: -1,
                         selectionEnd: -1,
+                        cursorPosition: 0
                     });
                 }
-
                 break;
             case "SWITCH":
                 try {
                     currentDocument = documents.find(o => o.title === contentOrStartPosition);
-                    // console.log('document is now ', currentDocument.title);
                 } catch (error) {
                     console.log(error);
                 }
                 break;
         }
     }
-    // console.log(currentDocument);
     // console.log(currentDocument.output.join(''));
     return currentDocument.output.join('');
 }
@@ -198,7 +206,7 @@ const query5 = [
 ];
 
 const query6 = [
-    ["APPEND", "Hello, world!"], 
+    ["APPEND", "Hello, world!"], // good
     ["SELECT", "7", "12"], 
     ["DELETE"],
     ["UNDO"],
@@ -214,16 +222,6 @@ const query7 = [
     ["UNDO"],
     ["REDO"],
     ["REDO"]
-]
-
-const query8 = [
-    ["APPEND", "Dog"],
-    ["MOVE", "0"],
-    ["DELETE"],
-    ["DELETE"],
-    ["DELETE"],
-    ["UNDO"],
-    ["UNDO"],
 ]
 
 const query9 = [
@@ -253,10 +251,9 @@ const query10 = [
 console.log(textEditor(query1) == "Hey, you");
 console.log(textEditor(query2) == "Hello, world!");
 console.log(textEditor(query3) == "");
-console.log(textEditor(query4) == "Hello!");
+console.log(textEditor(query4) == "Hello!"); // 
 console.log(textEditor(query5) == "Hell, world, worldo!");
-console.log(textEditor(query6) == "Hello, you!");
+console.log(textEditor(query6) == "Hello, you!"); 
 console.log(textEditor(query7) == "Hello, !");
-console.log(textEditor(query8) == "og");
 console.log(textEditor(query9) == "");
 console.log(textEditor(query10) == "Hello,!");
